@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/DicomViewerAPI/.vs/DicomViewerAPI/v16/Server/sqlite3
+/DicomViewerAPI/bin/Debug/netcoreapp3.1
+/DicomViewerAPI/obj/Debug/netcoreapp3.1
+/DicomViewerAPI/.vs/DicomViewerAPI/v16
+/DicomViewerAPI/.vs/DicomViewerAPI
+/DicomViewerAPI/obj
