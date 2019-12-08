@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DicomViewerAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace DicomViewerAPI.Controllers
 {
@@ -12,80 +10,189 @@ namespace DicomViewerAPI.Controllers
     [Route("api/[controller]")]
     public class DicomController : ControllerBase
     {
-        [HttpGet("GetAllStudiesFromOrthanc")]
-        public IActionResult GetAllStudiesFromOrthanc()
+        private IPACSService _pacsService;
+
+        public DicomController(IPACSService pacsService)
         {
-            var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8042/studies?expand");
+            _pacsService = pacsService;
+        }
 
-            request.Method = "GET";
-            //request.UserAgent = RequestConstants.UserAgentValue;
-            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+        [HttpGet("GetAllStudies")]
+        public async Task<IActionResult> GetAllStudies()
+        {
+            var result = await this._pacsService.GetAllStudies();
+            return Ok(result);
+            //var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8042/studies?expand");
 
-            var content = string.Empty;
+            //request.Method = "GET";
+            ////request.UserAgent = RequestConstants.UserAgentValue;
+            //request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-            using (var response = (HttpWebResponse)request.GetResponse())
-            {
-                using (var stream = response.GetResponseStream())
-                {
-                    using (var sr = new StreamReader(stream))
-                    {
-                        content = sr.ReadToEnd();
-                    }
-                }
-            }
+            //var content = string.Empty;
 
-            return Ok(content);
+            //using (var response = (HttpWebResponse)request.GetResponse())
+            //{
+            //    using (var stream = response.GetResponseStream())
+            //    {
+            //        using (var sr = new StreamReader(stream))
+            //        {
+            //            content = sr.ReadToEnd();
+            //        }
+            //    }
+            //}
+
+            // return Ok(content);
         }
 
 
-        [HttpGet("GetAllPatientsFromOrthanc")]
-        public IActionResult GetAllPatientsFromOrthanc()
+        [HttpGet("GetAllPatients")]
+        public async Task<IActionResult> GetAllPatients()
         {
-            var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8042/patients?expand");
+            var result = await this._pacsService.GetAllPatients();
+            return Ok(result);
+            //var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8042/patients?expand");
 
-            request.Method = "GET";
-            //request.UserAgent = RequestConstants.UserAgentValue;
-            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            //request.Method = "GET";
+            ////request.UserAgent = RequestConstants.UserAgentValue;
+            //request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-            var content = string.Empty;
+            //var content = string.Empty;
 
-            using (var response = (HttpWebResponse)request.GetResponse())
-            {
-                using (var stream = response.GetResponseStream())
-                {
-                    using (var sr = new StreamReader(stream))
-                    {
-                        content = sr.ReadToEnd();
-                    }
-                }
-            }
+            //using (var response = (HttpWebResponse)request.GetResponse())
+            //{
+            //    using (var stream = response.GetResponseStream())
+            //    {
+            //        using (var sr = new StreamReader(stream))
+            //        {
+            //            content = sr.ReadToEnd();
+            //        }
+            //    }
+            //}
 
-            return Ok(content);
+            //return Ok(content);
         }
 
-        [HttpGet("GetStudiesFromOrthanc/{patientId}")]
-        public IActionResult GetStudiesFromOrthanc(string patientId)
+        [HttpGet("GetPatientStudies/{patientId}")]
+        public async Task<IActionResult> GetPatientStudies(string patientId)
         {
-            var request = (HttpWebRequest)WebRequest.Create(string.Format("http://127.0.0.1:8042/patients/{0}/studies", patientId));
+            var result = await this._pacsService.GetPatientStudies(patientId);
+            return Ok(result);
+            //var request = (HttpWebRequest)WebRequest.Create(string.Format("http://127.0.0.1:8042/patients/{0}/studies", patientId));
 
-            request.Method = "GET";
-            //request.UserAgent = RequestConstants.UserAgentValue;
-            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+            //request.Method = "GET";
+            ////request.UserAgent = RequestConstants.UserAgentValue;
+            //request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-            var content = string.Empty;
+            //var content = string.Empty;
 
-            using (var response = (HttpWebResponse)request.GetResponse())
-            {
-                using (var stream = response.GetResponseStream())
-                {
-                    using (var sr = new StreamReader(stream))
-                    {
-                        content = sr.ReadToEnd();
-                    }
-                }
-            }
+            //using (var response = (HttpWebResponse)request.GetResponse())
+            //{
+            //    using (var stream = response.GetResponseStream())
+            //    {
+            //        using (var sr = new StreamReader(stream))
+            //        {
+            //            content = sr.ReadToEnd();
+            //        }
+            //    }
+            //}
 
-            return Ok(content);
+            //return Ok(content);
+        }
+
+        [HttpGet("GetAllSeries")]
+        public async Task<IActionResult> GetAllSeries()
+        {
+            var result = await this._pacsService.GetAllSeries();
+            return Ok(result);
+            //var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8042/series?expand");
+
+            //request.Method = "GET";
+            ////request.UserAgent = RequestConstants.UserAgentValue;
+            //request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
+            //var content = string.Empty;
+
+            //using (var response = (HttpWebResponse)request.GetResponse())
+            //{
+            //    using (var stream = response.GetResponseStream())
+            //    {
+            //        using (var sr = new StreamReader(stream))
+            //        {
+            //            content = sr.ReadToEnd();
+            //        }
+            //    }
+            //}
+
+            //return Ok(content);
+        }
+
+        [HttpGet("GetSeriesById/{seriesId}")]
+        public async Task<IActionResult> GetSeriesById(string seriesId)
+        {
+            var result = await this._pacsService.GetSeriesById(seriesId);
+            return Ok(result);
+            //var request = (HttpWebRequest)WebRequest.Create(string.Format("http://127.0.0.1:8042/series/{0}", seriesId));
+
+            //request.Method = "GET";
+            ////request.UserAgent = RequestConstants.UserAgentValue;
+            //request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
+            //var content = string.Empty;
+
+            //using (var response = (HttpWebResponse)request.GetResponse())
+            //{
+            //    using (var stream = response.GetResponseStream())
+            //    {
+            //        using (var sr = new StreamReader(stream))
+            //        {
+            //            content = sr.ReadToEnd();
+            //        }
+            //    }
+            //}
+
+            //return Ok(content);
+        }
+
+        [HttpGet("GetImageSeriesByPatientId/{patientId}")]
+        public async Task<ActionResult> GetImageSeriesByPatientId(string patientId)
+        {
+            var result = await this._pacsService.GetImageSeriesByPatientId(patientId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetImageSeriesByStudyId/{studyId}")]
+        public async Task<ActionResult> GetImageSeriesByStudyId(string studyId)
+        {
+            var result = await this._pacsService.GetImageSeriesByStudyId(studyId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetImageStudyByStudyId/{studyId}")]
+        public async Task<ActionResult> GetImageStudyByStudyId(string studyId)
+        {
+            var result = await this._pacsService.GetImageStudyByStudyId(studyId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetInstanceById/{instanceId}")]
+        public async Task<ActionResult> GetInstanceById(string instanceId)
+        {
+            var result = await this._pacsService.GetInstanceById(instanceId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetInstanceById1/{instanceId}")]
+        public ActionResult GetInstanceById1(string instanceId)
+        {
+            var result = this._pacsService.GetInstancePreviewById(instanceId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetInstanceById2/{instanceId}")]
+        public ActionResult GetInstanceById2(string instanceId)
+        {
+            var result = this._pacsService.GetInstancePreviewById(instanceId);
+            return File(result, "image/jpeg");
         }
     }
 }
