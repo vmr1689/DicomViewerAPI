@@ -20,6 +20,6 @@ namespace DicomViewerAPI.Services
         Task<List<ImageSeriesModel>> GetImageSeriesByStudyId(string studyId);
         Task<ImageStudyModel> GetImageStudyByStudyId(string studyId);
         Task<InstanceModel> GetInstanceById(string instanceId);
-        byte[] GetInstancePreviewById(string instanceId);
+        string GetInstancePreviewById(string instanceId, string hostUrl = "");
     }
 }

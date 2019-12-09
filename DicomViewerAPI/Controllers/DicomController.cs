@@ -1,4 +1,6 @@
-﻿using DicomViewerAPI.Services;
+﻿using Dicom;
+using Dicom.Network;
+using DicomViewerAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Net;
@@ -11,7 +13,8 @@ namespace DicomViewerAPI.Controllers
     public class DicomController : ControllerBase
     {
         private IPACSService _pacsService;
-
+        private static readonly string PathToDicomImages = Path.Combine(@"D:\DicomViewerApi\dcm\");
+        private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\DicomViewerApi\jpg\");
         public DicomController(IPACSService pacsService)
         {
             _pacsService = pacsService;
@@ -184,15 +187,10 @@ namespace DicomViewerAPI.Controllers
         [HttpGet("GetInstanceById1/{instanceId}")]
         public ActionResult GetInstanceById1(string instanceId)
         {
-            var result = this._pacsService.GetInstancePreviewById(instanceId);
-            return Ok(result);
-        }
-
-        [HttpGet("GetInstanceById2/{instanceId}")]
-        public ActionResult GetInstanceById2(string instanceId)
-        {
-            var result = this._pacsService.GetInstancePreviewById(instanceId);
-            return File(result, "image/jpeg");
+            string hostUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
+            var result = this._pacsService.GetInstancePreviewById(instanceId, hostUrl);
+            var aa = new { path = result};
+            return Ok(aa);
         }
     }
 }

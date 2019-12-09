@@ -2,8 +2,10 @@
 using DicomViewerAPI.Models.Orthanc;
 using Microsoft.Extensions.Options;
 using RestSharp;
+using RestSharp.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,6 +14,9 @@ namespace DicomViewerAPI.Services
 {
     public class OrthancService : IPACSService
     {
+        private static readonly string PathToDicomImages = Path.Combine(@"D:\DicomViewerApi\dcm\");
+        private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\DicomViewerApi\jpg\");
+
         private readonly AppSettings _appSettings;
 
         private static readonly IEnumerable<HttpStatusCode> ValidStatusCodes = new List<HttpStatusCode>
@@ -370,18 +375,24 @@ namespace DicomViewerAPI.Services
             return await Task.FromResult<InstanceModel>(returnResponse);
         }
 
-        public byte[] GetInstancePreviewById(string instanceId)
+        public string GetInstancePreviewById(string instanceId, string hostUrl = "")
         {
-            var apiUrl = string.Format("/instances/{0}/preview", instanceId);
+            var apiUrl = string.Format("/instances/{0}/file", instanceId);
+
             var request = new RestRequest(apiUrl, Method.GET);
             request.AddHeader("Access-Control-Allow-Origin", "*");
             request.AddHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
             request.AddHeader("Accept-Encoding", "gzip, deflate, br");
-            request.AddHeader("Accept-Encoding", "image/png");
 
-            var aa = _client.Execute(request);
+            var dcmPath = Path.Combine(PathToDicomImages, instanceId) + ".dcm";
 
-            return aa.RawBytes;
+            var response = _client.Execute(request);
+            response.RawBytes.SaveAs(dcmPath);
+
+            var hostdcm = hostUrl + "/dcm/" + instanceId + ".dcm";
+
+            return hostdcm;
+
         }
     }
 }
