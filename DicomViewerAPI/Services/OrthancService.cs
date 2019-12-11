@@ -9,13 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace DicomViewerAPI.Services
 {
     public class OrthancService : IPACSService
     {
-        private static readonly string PathToDicomImages = Path.Combine(@"D:\DicomViewerApi\dcm\");
-        private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\DicomViewerApi\jpg\");
+        private static readonly string PathToDicomImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\dcm\");
+        private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\jpg\");
 
         private readonly AppSettings _appSettings;
 
@@ -393,6 +394,17 @@ namespace DicomViewerAPI.Services
 
             return hostdcm;
 
+        }
+
+        public async Task<object> GetDicomTagsById(string instanceId)
+        {
+            var apiUrl = string.Format("/instances/{0}/tags", instanceId);
+            var request = new RestRequest(apiUrl, Method.GET);
+
+            var response = await this.SendRequestAsync<object>(request, string.Empty, apiUrl);
+
+            object jsonTags = JsonConvert.DeserializeObject(response.Content);
+            return jsonTags;
         }
     }
 }

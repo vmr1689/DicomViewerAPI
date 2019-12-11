@@ -20,8 +20,8 @@ namespace DicomViewerAPI
     public class Startup
     {
 
-        private static readonly string PathToDicomImages = Path.Combine(@"D:\DicomViewerApi\dcm\");
-        private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\DicomViewerApi\jpg\");
+        private static readonly string PathToDicomImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\dcm\");
+        private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\jpg\");
 
         string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -41,7 +41,7 @@ namespace DicomViewerAPI
                 options.AddPolicy(MyAllowSpecificOrigins,
                 builder =>
                 {
-                    builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod();
+                    builder.WithOrigins("http://localhost:5000").AllowAnyHeader().AllowAnyMethod();
                 });
             });
 

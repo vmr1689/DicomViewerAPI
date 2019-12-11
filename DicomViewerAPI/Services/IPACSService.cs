@@ -21,5 +21,7 @@ namespace DicomViewerAPI.Services
         Task<ImageStudyModel> GetImageStudyByStudyId(string studyId);
         Task<InstanceModel> GetInstanceById(string instanceId);
         string GetInstancePreviewById(string instanceId, string hostUrl = "");
+
+        Task<object> GetDicomTagsById(string instanceId);
     }
 }

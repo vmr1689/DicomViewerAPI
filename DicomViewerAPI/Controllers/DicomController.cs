@@ -192,5 +192,12 @@ namespace DicomViewerAPI.Controllers
             var aa = new { path = result};
             return Ok(aa);
         }
+
+        [HttpGet("GetDicomTagsById/{instanceId}")]
+        public async Task<ActionResult> GetDicomTagsById(string instanceId)
+        {
+            var result = await this._pacsService.GetDicomTagsById(instanceId);
+            return Ok(result);
+        }
     }
 }
