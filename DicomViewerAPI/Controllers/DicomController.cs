@@ -199,5 +199,13 @@ namespace DicomViewerAPI.Controllers
             var result = await this._pacsService.GetDicomTagsById(instanceId);
             return Ok(result);
         }
+
+        [HttpGet("GetSegmentsByInstanceId/{instanceId}")]
+        public async Task<ActionResult> GetSegmentsByInstanceId(string instanceId)
+        {
+            string hostUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
+            var result = await this._pacsService.GetSegmentsByInstanceId(instanceId, hostUrl);
+            return Ok(result);
+        }
     }
 }

@@ -26,6 +26,7 @@ namespace DicomViewerAPI
 
         private static readonly string PathToDicomImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\dcm\");
         private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\jpg\");
+        private static readonly string PathToDicomSegments = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\segments\");
 
         string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -137,6 +138,12 @@ namespace DicomViewerAPI
                 RequestPath = new PathString("/djpg")
             });
 
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(PathToDicomSegments)),
+                RequestPath = new PathString("/dsegments")
+
+            });
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(PathToDicomImages)),
@@ -148,6 +155,12 @@ namespace DicomViewerAPI
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(PathToDicomJpgImages)),
                 RequestPath = new PathString("/jpg")
+            });
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(PathToDicomSegments)),
+                RequestPath = new PathString("/segments")
             });
 
             if (env.IsDevelopment())

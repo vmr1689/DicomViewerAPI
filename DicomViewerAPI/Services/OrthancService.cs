@@ -17,6 +17,7 @@ namespace DicomViewerAPI.Services
     {
         private static readonly string PathToDicomImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\dcm\");
         private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\jpg\");
+        private static readonly string PathToDicomSegments = Path.Combine(@"D:\POC\Latest\DicomViewer\Api\DicomViewerAPI\DicomViewerAPI\Images\segments\");
 
         private readonly AppSettings _appSettings;
 
@@ -127,7 +128,7 @@ namespace DicomViewerAPI.Services
             }
 
             ImageSeriesParentStudyModel returnResponse = new ImageSeriesParentStudyModel();
-            
+
 
             return await Task.FromResult<ImageSeriesParentStudyModel>(returnResponse);
         }
@@ -135,7 +136,7 @@ namespace DicomViewerAPI.Services
         private async Task<IRestResponse<T>> SendRequestAsync<T>(IRestRequest request, string bearerToken, string apiUrl, bool isIAMRequest = false)
         {
             var result = await _client.ExecuteTaskAsync<T>(request);
-            
+
             return result;
         }
 
@@ -217,7 +218,7 @@ namespace DicomViewerAPI.Services
 
                         foreach (var inst in item.Instances)
                         {
-                            
+
                             var instanceModel = new ImageSeriesInstanceModel();
 
                             var preview = _appSettings.OrthancServiceUrl + "/instances/" + inst + "/preview";
@@ -236,7 +237,7 @@ namespace DicomViewerAPI.Services
                         item.ParentStudyModel = await this.GetImageStudyById(item.ParentStudy);
                     }
                 }
-                
+
                 return response.Data;
             }
 
@@ -286,7 +287,7 @@ namespace DicomViewerAPI.Services
 
                 }
 
-                var result = response.Data.Where(x=>x.ParentStudy == studyId).ToList();
+                var result = response.Data.Where(x => x.ParentStudy == studyId).ToList();
                 return result;
             }
 
@@ -341,12 +342,12 @@ namespace DicomViewerAPI.Services
 
             returnResponse.PatientName = response.Data.FirstOrDefault().ParentStudyModel.PatientMainDicomTags.PatientName;
             var studyDate = response.Data.FirstOrDefault().ParentStudyModel.MainDicomTags.StudyDate;
-            
+
             if (studyDate != null)
             {
                 returnResponse.StudyDate = DateTime.ParseExact(studyDate, "yyyyMMdd", null).ToString("yyyy-MM-dd");
             }
-            
+
             returnResponse.Series = new List<ImageSeriesModel>();
             returnResponse.Series.AddRange(response.Data);
 
@@ -405,6 +406,80 @@ namespace DicomViewerAPI.Services
 
             object jsonTags = JsonConvert.DeserializeObject(response.Content);
             return jsonTags;
+        }
+
+        public async Task<InstanceSegmentsModel> GetSegmentsByInstanceId(string instanceId, string hostUrl = "")
+        {
+            var apiUrl = string.Format("/instances/{0}/tags", instanceId);
+            var request = new RestRequest(apiUrl, Method.GET);
+
+            var response = await this.SendRequestAsync<List<Dictionary<string, InstanceTagsModel>>>(request, string.Empty, apiUrl);
+
+            if (response.IsSuccessful)
+            {
+                var result = new InstanceSegmentsModel();
+                var values = response.Data.SelectMany(x => x.Values).ToList();
+
+                result.PatientName = values.SingleOrDefault(x => x.Name == "PatientName").Value;
+                result.InstanceCreationDate = values.SingleOrDefault(x => x.Name == "InstanceCreationDate").Value;
+
+                var instanceSegmentsPath = Path.Combine(PathToDicomSegments, instanceId);
+
+                if (Directory.Exists(instanceSegmentsPath))
+                {
+                    var instanceSegmentFiles = Directory.GetFiles(instanceSegmentsPath, "*.jpg");
+
+                    foreach (var file in instanceSegmentFiles)
+                    {
+                        var segmentsModel = new SegmentsModel();
+
+                        var fileName = Path.GetFileNameWithoutExtension(file);
+                        var jpgFilePath = Path.Combine(instanceSegmentsPath, fileName) + ".jpg";
+
+                        if (File.Exists(jpgFilePath))
+                        {
+                            var finalPath = hostUrl + "/segments/" + instanceId + "/" + fileName + ".jpg";
+                            segmentsModel.Name = fileName;
+                            segmentsModel.Type = ".jpg";
+                            segmentsModel.Url = finalPath;
+
+                            result.Segments.Add(segmentsModel);
+                        }
+                    }
+                    return result;
+                }
+                else
+                {
+                    var segmentsPath = Path.Combine(PathToDicomSegments);
+
+                    if (Directory.Exists(segmentsPath))
+                    {
+                        var segmentFiles = Directory.GetFiles(segmentsPath, "*.jpg");
+
+                        foreach (var file in segmentFiles)
+                        {
+                            var segmentsModel = new SegmentsModel();
+
+                            var fileName = Path.GetFileNameWithoutExtension(file);
+                            var jpgFilePath = Path.Combine(segmentsPath, fileName) + ".jpg";
+
+                            if (File.Exists(jpgFilePath))
+                            {
+                                var finalPath = hostUrl + "/segments/" + fileName + ".jpg";
+                                segmentsModel.Name = fileName;
+                                segmentsModel.Type = ".jpg";
+                                segmentsModel.Url = finalPath;
+
+                                result.Segments.Add(segmentsModel);
+                            }
+                        }
+                    }
+                    return result;
+                }
+            }
+
+            InstanceSegmentsModel returnResponse = new InstanceSegmentsModel();
+            return await Task.FromResult<InstanceSegmentsModel>(returnResponse);
         }
     }
 }

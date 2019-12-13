@@ -23,5 +23,6 @@ namespace DicomViewerAPI.Services
         string GetInstancePreviewById(string instanceId, string hostUrl = "");
 
         Task<object> GetDicomTagsById(string instanceId);
+        Task<InstanceSegmentsModel> GetSegmentsByInstanceId(string instanceId, string hostUrl = "");
     }
 }
