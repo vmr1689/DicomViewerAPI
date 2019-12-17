@@ -423,7 +423,7 @@ namespace DicomViewerAPI.Services
                 result.PatientName = values.SingleOrDefault(x => x.Name == "PatientName").Value;
                 result.InstanceCreationDate = values.SingleOrDefault(x => x.Name == "InstanceCreationDate").Value;
 
-                var instanceSegmentsPath = Path.Combine(PathToDicomSegments, instanceId);
+                var instanceSegmentsPath = Path.Combine(PathToDicomSegments, instanceId) + "/segments/";
 
                 if (Directory.Exists(instanceSegmentsPath))
                 {
@@ -438,7 +438,7 @@ namespace DicomViewerAPI.Services
 
                         if (File.Exists(jpgFilePath))
                         {
-                            var finalPath = hostUrl + "/segments/" + instanceId + "/" + fileName + ".jpg";
+                            var finalPath = hostUrl + "/segments/" + instanceId + "/segments/" + fileName + ".jpg";
                             segmentsModel.Name = fileName;
                             segmentsModel.Type = ".jpg";
                             segmentsModel.Url = finalPath;
