@@ -182,7 +182,8 @@ namespace DicomViewerAPI.Services
 
         public async Task<List<SeriesModel>> GetSeriesById(string seriesId)
         {
-            var apiUrl = string.Format("/series/{0}", seriesId);
+            //var apiUrl = string.Format("/series/{0}", seriesId);
+            var apiUrl = string.Format("/studies/{0}/series", seriesId);
             var request = new RestRequest(apiUrl, Method.GET);
 
             var response = await this.SendRequestAsync<List<SeriesModel>>(request, string.Empty, apiUrl);
@@ -299,9 +300,10 @@ namespace DicomViewerAPI.Services
             return await Task.FromResult<List<ImageSeriesModel>>(returnResponse);
         }
 
-        public async Task<ImageStudyModel> GetImageStudyByStudyId(string studyId)
+        public async Task<ImageStudyModel> GetImageStudyByStudyId(string seriesId)
         {
-            var apiUrl = string.Format("/studies/{0}/series?expand", studyId);
+            //var apiUrl = string.Format("/studies/{0}/series?expand", studyId);
+            var apiUrl = string.Format("/series/{0}", seriesId);
             var request = new RestRequest(apiUrl, Method.GET);
 
             var response = await this.SendRequestAsync<List<ImageSeriesModel>>(request, string.Empty, apiUrl);

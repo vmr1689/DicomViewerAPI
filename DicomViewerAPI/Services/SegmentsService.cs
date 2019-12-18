@@ -29,30 +29,8 @@ namespace DicomViewerAPI.Services
         public async Task<string> SegmentImagesAsync(Segments segments)
         {
             string zipFilePath = _appSettings.SegmentImagesZipPath + segments.InstanceId + ".zip";
-
             if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
-
-
-            if (Directory.Exists(_appSettings.SegmentImagesZipPath + segments.InstanceId))
-            {
-                //System.IO.DirectoryInfo di = new DirectoryInfo(_appSettings.SegmentImagesZipPath + segments.InstanceId + "/segments");
-                //foreach (FileInfo file in di.GetFiles())
-                //{
-                //    file.Delete();
-                //}
-                //foreach (DirectoryInfo dir in di.GetDirectories())
-                //{
-                //    dir.Delete(true);
-                //}
-                Directory.Delete(_appSettings.SegmentImagesZipPath + segments.InstanceId,true);
-            }
-
-
-            if (Directory.Exists(_appSettings.SegmentImagesZipPath + segments.InstanceId))
-            {
-
-                Directory.Delete(_appSettings.SegmentImagesZipPath + segments.InstanceId);
-            }
+            if (Directory.Exists(_appSettings.SegmentImagesZipPath + segments.InstanceId)) Directory.Delete(_appSettings.SegmentImagesZipPath + segments.InstanceId,true);
             using (var httpClient = new HttpClient())
             {
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), _appSettings.ImageSegmentServiceURL))
@@ -81,7 +59,6 @@ namespace DicomViewerAPI.Services
                                 try
                                 {
                                  await contentStream.CopyToAsync(fileStream);
-                                  //contentStream.Close();
                                 }
                                 catch (Exception e)
                                 {
@@ -93,11 +70,7 @@ namespace DicomViewerAPI.Services
                                     if (contentStream != null)
                                         contentStream.Dispose();
                                     if (fileStream != null)
-                                    {
                                         fileStream.Dispose();
-                                        //System.Threading.Thread.Sleep(3000);
-                                    }
-
                                     if (File.Exists(zipFilePath))
                                         ZipFile.ExtractToDirectory(zipFilePath, _appSettings.SegmentImagesZipPath + segments.InstanceId);
                                 }
@@ -109,9 +82,6 @@ namespace DicomViewerAPI.Services
 
                 }
             }
-            //System.Threading.Thread.Sleep(5000);
-            //if (File.Exists(zipFilePath))
-            //    ZipFile.ExtractToDirectory(zipFilePath, _appSettings.SegmentImagesZipPath + segments.InstanceId);
             return "Segmentation Success";
         }
 
