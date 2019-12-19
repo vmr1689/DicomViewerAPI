@@ -1,5 +1,6 @@
 ﻿using Dicom;
 using Dicom.Network;
+using DicomViewerAPI.Models;
 using DicomViewerAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
@@ -13,6 +14,7 @@ namespace DicomViewerAPI.Controllers
     public class DicomController : ControllerBase
     {
         private IPACSService _pacsService;
+        public Segments segment = new Segments();
         private static readonly string PathToDicomImages = Path.Combine(@"D:\DicomViewerApi\dcm\");
         private static readonly string PathToDicomJpgImages = Path.Combine(@"D:\DicomViewerApi\jpg\");
         public DicomController(IPACSService pacsService)
@@ -200,11 +202,30 @@ namespace DicomViewerAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("GetSegmentsByInstanceId/{instanceId}")]
-        public async Task<ActionResult> GetSegmentsByInstanceId(string instanceId)
+        [HttpGet("GetTHSegmentsByInstanceId/{instanceId}")]
+        public async Task<ActionResult> GetTHSegmentsByInstanceId(string instanceId)
         {
             string hostUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
-            var result = await this._pacsService.GetSegmentsByInstanceId(instanceId, hostUrl);
+            segment.IsThreshold = true;
+            var result = await this._pacsService.GetSegmentsByInstanceId(segment, instanceId, hostUrl);
+            return Ok(result);
+        }
+
+        [HttpGet("GetKMSegmentsByInstanceId/{instanceId}")]
+        public async Task<ActionResult> GetKMSegmentsByInstanceId(string instanceId)
+        {
+            string hostUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
+            segment.IsKMeans = true;
+            var result = await this._pacsService.GetSegmentsByInstanceId(segment, instanceId, hostUrl);
+            return Ok(result);
+        }
+
+        [HttpGet("GetRGSegmentsByInstanceId/{instanceId}")]
+        public async Task<ActionResult> GetRGSegmentsByInstanceId(string instanceId)
+        {
+            string hostUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
+            segment.IsRegionGrowth = true;
+            var result = await this._pacsService.GetSegmentsByInstanceId(segment, instanceId, hostUrl);
             return Ok(result);
         }
     }

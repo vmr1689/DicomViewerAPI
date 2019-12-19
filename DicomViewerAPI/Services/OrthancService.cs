@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using DicomViewerAPI.Models;
 
 namespace DicomViewerAPI.Services
 {
@@ -410,7 +411,7 @@ namespace DicomViewerAPI.Services
             return jsonTags;
         }
 
-        public async Task<InstanceSegmentsModel> GetSegmentsByInstanceId(string instanceId, string hostUrl = "")
+        public async Task<InstanceSegmentsModel> GetSegmentsByInstanceId(Segments segments, string instanceId, string hostUrl = "")
         {
             var apiUrl = string.Format("/instances/{0}/tags", instanceId);
             var request = new RestRequest(apiUrl, Method.GET);
@@ -423,9 +424,32 @@ namespace DicomViewerAPI.Services
                 var values = response.Data.SelectMany(x => x.Values).ToList();
 
                 result.PatientName = values.SingleOrDefault(x => x.Name == "PatientName").Value;
-                result.InstanceCreationDate = values.SingleOrDefault(x => x.Name == "InstanceCreationDate").Value;
+                //result.InstanceCreationDate = values.SingleOrDefault(x => x.Name == "InstanceCreationDate").Value;
 
-                var instanceSegmentsPath = Path.Combine(PathToDicomSegments, instanceId) + "/segments/";
+                //try
+                //{
+                //    result.InstanceCreationDate = values.SingleOrDefault(x => x.Name == "InstanceCreationDate").Value;
+                //}
+                //catch(Exception ex)
+                //{
+                //    result.InstanceCreationDate = "-";
+                //}
+                string folderName = string.Empty;
+                if(segments.IsThreshold)
+                {
+                    folderName = @"\Threshold\" + instanceId + @"\segments\threshold_segments\";
+                }
+                else if(segments.IsKMeans)
+                {
+                    folderName = @"\KMeans\" + instanceId + @"\segments\kmeans_segments\";
+                }
+                else if (segments.IsRegionGrowth)
+                {
+                    folderName = @"\RegionGrowth\" + instanceId + @"\segments\regiongrowth_segments\";
+                }
+
+                //var instanceSegmentsPath = Path.Combine(PathToDicomSegments, folderName);
+                var instanceSegmentsPath = PathToDicomSegments + folderName;
 
                 if (Directory.Exists(instanceSegmentsPath))
                 {
@@ -440,7 +464,7 @@ namespace DicomViewerAPI.Services
 
                         if (File.Exists(jpgFilePath))
                         {
-                            var finalPath = hostUrl + "/segments/" + instanceId + "/segments/" + fileName + ".jpg";
+                            var finalPath = hostUrl + "/segments/" + folderName.Replace("\\","/") + fileName + ".jpg";
                             segmentsModel.Name = fileName;
                             segmentsModel.Type = ".jpg";
                             segmentsModel.Url = finalPath;

@@ -1,4 +1,5 @@
-﻿using DicomViewerAPI.Models.Orthanc;
+﻿using DicomViewerAPI.Models;
+using DicomViewerAPI.Models.Orthanc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,6 @@ namespace DicomViewerAPI.Services
         string GetInstancePreviewById(string instanceId, string hostUrl = "");
 
         Task<object> GetDicomTagsById(string instanceId);
-        Task<InstanceSegmentsModel> GetSegmentsByInstanceId(string instanceId, string hostUrl = "");
+        Task<InstanceSegmentsModel> GetSegmentsByInstanceId(Segments segments, string instanceId, string hostUrl = "");
     }
 }

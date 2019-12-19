@@ -9,6 +9,10 @@ namespace DicomViewerAPI.Models
     {
         public string InstanceId { get; set; }
         public string Segment { get; set; }
+
+        public bool IsThreshold { get; set; }
+        public bool IsKMeans { get; set; }
+        public bool IsRegionGrowth { get; set; }
         
     }
 }

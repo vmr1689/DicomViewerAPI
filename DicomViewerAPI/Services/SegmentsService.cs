@@ -28,16 +28,35 @@ namespace DicomViewerAPI.Services
 
         public async Task<string> SegmentImagesAsync(Segments segments)
         {
-            string zipFilePath = _appSettings.SegmentImagesZipPath + segments.InstanceId + ".zip";
-            if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
-            if (Directory.Exists(_appSettings.SegmentImagesZipPath + segments.InstanceId)) Directory.Delete(_appSettings.SegmentImagesZipPath + segments.InstanceId,true);
+            string postSegment = string.Empty;
+            string zipFilePath = string.Empty;
+            string zipFileName = segments.InstanceId + ".zip";
+            if (segments.IsThreshold) 
+            { 
+                postSegment = "threshold";
+                zipFilePath = _appSettings.SegmentImagesZipPath + @"\Threshold\";
+            }
+            else if (segments.IsKMeans) 
+            { 
+                postSegment = "kmeans";
+                zipFilePath = _appSettings.SegmentImagesZipPath + @"\KMeans\";
+            }
+            else if (segments.IsRegionGrowth)
+            { 
+                postSegment = "regiongrowth";
+                zipFilePath = _appSettings.SegmentImagesZipPath + @"\RegionGrowth\";
+            }
+
+            //string zipFilePath = _appSettings.SegmentImagesZipPath + segments.InstanceId + ".zip";
+            if (File.Exists(zipFilePath + zipFileName)) File.Delete(zipFilePath + zipFileName);
+            if (Directory.Exists(zipFilePath + segments.InstanceId)) Directory.Delete(zipFilePath + segments.InstanceId,true);
             using (var httpClient = new HttpClient())
             {
-                using (var request = new HttpRequestMessage(new HttpMethod("POST"), _appSettings.ImageSegmentServiceURL))
+                using (var request = new HttpRequestMessage(new HttpMethod("POST"), _appSettings.ImageSegmentServiceURL + "/"+ postSegment))
                 {
                     string inputImgFile = _appSettings.InputImagePath + segments.InstanceId + ".jpg";
                     //string zipFilePath = _appSettings.SegmentImagesZipPath + segments.InstanceId + ".zip";
-                    var fileStream = new FileStream(zipFilePath , FileMode.Create, FileAccess.Write, FileShare.None);
+                    var fileStream = new FileStream(zipFilePath + zipFileName, FileMode.Create, FileAccess.Write, FileShare.None);
 
                     var multipartContent = new MultipartFormDataContent();
                     multipartContent.Add(new StringContent(segments.Segment), "segments");
@@ -71,8 +90,8 @@ namespace DicomViewerAPI.Services
                                         contentStream.Dispose();
                                     if (fileStream != null)
                                         fileStream.Dispose();
-                                    if (File.Exists(zipFilePath))
-                                        ZipFile.ExtractToDirectory(zipFilePath, _appSettings.SegmentImagesZipPath + segments.InstanceId);
+                                    if (File.Exists(zipFilePath + zipFileName))
+                                        ZipFile.ExtractToDirectory(zipFilePath + zipFileName, zipFilePath + segments.InstanceId);
                                 }
                             }
                         }
